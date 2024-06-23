@@ -133,6 +133,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Client|x64'">
     <IncludePath>D:\Boost-app\boost_1_85_0;$(IncludePath)</IncludePath>
     <LibraryPath>D:\Boost-app\boost_1_85_0\libs;$(LibraryPath)</LibraryPath>
+    <TargetName>$(ProjectName)-client</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -245,6 +246,9 @@
     <ClCompile Include="Client.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Server|x64'">true</ExcludedFromBuild>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="chat_message.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
