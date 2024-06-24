@@ -1,63 +1,82 @@
-//下面是消息的头文件
-#ifndef chat_message_hpp                                                                                                      
-#define chat_message_hpp                                                                                                      
+#ifndef CHAT_MESSAGE_HPP
+#define CHAT_MESSAGE_HPP
 
-#include <cstdio>                                                                                                             
-#include <cstdlib>                                                                                                            
-#include <cstring>                                                                                                            
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <random>
+#include <string>
 
-//承载内容的消息包的类：包含header和body（类似于http协议），header包含了body相关属性，比如这里用固定的4个字节保存了body中字节个数
 class chat_message {
-
 public:
-    enum { header_length = 4 };//固定的4个字节                                                                                  
-    enum { max_body_length = 512 };//body最大字节个数                                                                           
+    enum { header_length = 4 };
+    enum { max_body_length = 512 };
 
-    chat_message() :m_body_length(0), m_data("") {}
-    ~chat_message() {}
+    chat_message() : body_length_(0) { }
 
-    //信息字节数组
-    char* data() { return m_data; };
+    const char* data() const { return data_; }
+    char* data() { return data_; }
+    std::size_t length() const { return header_length + body_length_; }
 
-    //信息字节数组中有效长度，即头+体的总长度
-    std::size_t length() { return header_length + m_body_length; }
-
-    //获取指向包体的指针
-    char* body() { return m_data + header_length; }
-
-    //获取包体长度
-    std::size_t body_length() { return m_body_length; }
-
-    //设置包体长度
+    const char* body() const { return data_ + header_length; }
+    char* body() { return data_ + header_length; }
+    std::size_t body_length() const { return body_length_; }
     void body_length(std::size_t new_length) {
-        m_body_length = new_length;
-        if (m_body_length > max_body_length) {
-            m_body_length = max_body_length;
-        }
+        body_length_ = new_length;
+        if (body_length_ > max_body_length)
+            body_length_ = max_body_length;
     }
 
-    //解码头信息
-    bool decoder_header() {
+    bool decode_header() {
         char header[header_length + 1] = "";
-        strncat_s(header, m_data, header_length);
-        m_body_length = std::atoi(header);
-        if (m_body_length > max_body_length) {
-            m_body_length = 0;
+        strncpy_s(header, sizeof(header), data_, header_length);
+        body_length_ = std::atoi(header);
+        if (body_length_ > max_body_length) {
+            body_length_ = 0;
             return false;
         }
         return true;
     }
 
-    //编码头信息
     void encode_header() {
         char header[header_length + 1] = "";
-        sprintf_s(header, "%4d", static_cast<int>(m_body_length));
-        std::memcpy(m_data, header, header_length);
+        sprintf_s(header, sizeof(header), "%4d", static_cast<int>(body_length_));
+        memcpy_s(data_, sizeof(data_), header, header_length);
+    }
+
+    void update_body_with_time_and_id() {
+        std::string time_and_id = get_current_time() + " ID:" + generate_random_id() + " ";
+        std::string updated_body = time_and_id + std::string(body(), body_length_);
+        body_length(updated_body.size());
+        memcpy_s(body(), max_body_length, updated_body.data(), updated_body.size());
     }
 
 private:
-    std::size_t m_body_length;//body长度，即字节个数
-    char m_data[header_length + max_body_length];//用来存放消息：固定的前4个字节保存了body中字节个数，接着是body信息
+    std::size_t body_length_;
+    char data_[header_length + max_body_length];
+
+    std::string generate_random_id(size_t length = 5) {
+        const std::string chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        std::random_device random_device;
+        std::mt19937 generator(random_device());
+        std::uniform_int_distribution<> distribution(0, chars.size() - 1);
+
+        std::string random_string;
+        for (size_t i = 0; i < length; ++i) {
+            random_string += chars[distribution(generator)];
+        }
+        return random_string;
+    }
+
+    std::string get_current_time() {
+        std::time_t now = std::time(nullptr);
+        struct tm timeinfo = { 0 };
+        localtime_s(&timeinfo, &now); // Use localtime_s instead of localtime
+        char buf[100] = { 0 };
+        strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &timeinfo);
+        return std::string(buf);
+    }
 };
 
-#endif /* chat_message_hpp */
+#endif // CHAT_MESSAGE_HPP

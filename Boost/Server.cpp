@@ -104,7 +104,7 @@ public:
         boost::asio::async_read(m_socket,
             boost::asio::buffer(m_read_msg.data(), chat_message::header_length),
             [this, sharedFromThis](boost::system::error_code ec, std::size_t lenght) {
-                if (!ec && m_read_msg.decoder_header()) {
+                if (!ec && m_read_msg.decode_header()) {
                     do_read_body();
                 }
                 else {
