@@ -30,9 +30,10 @@ class chat_room {
 public:
     void join(chat_participant_ptr participant) {
         participants_.insert(participant);
-        for (auto& msg : recent_msgs_) {
-            participant->deliver(msg);
-        }
+        // Comment out the following line to prevent sending previous messages
+        // for (auto& msg : recent_msgs_) {
+        //     participant->deliver(msg);
+        // }
     }
 
     void leave(chat_participant_ptr participant) {
@@ -44,6 +45,7 @@ public:
         while (recent_msgs_.size() > max_recent_msgs) {
             recent_msgs_.pop_front();
         }
+
         std::string body(msg.body(), msg.body_length());
         std::string recipient_id = body.substr(body.find("Recipient:") + 10, 5); // assuming recipient ID is of length 5
         for (auto participant : participants_) {

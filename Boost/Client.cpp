@@ -116,15 +116,18 @@ int main(int argc, char* argv[]) {
         std::thread t([&io_service]() { io_service.run(); });
 
         char line[chat_message::max_body_length + 1];
-        while (std::cin.getline(line, chat_message::max_body_length + 1)) {
+        while (true) {
             std::string recipient_id;
             std::cout << "Enter recipient ID: ";
             std::getline(std::cin, recipient_id);
 
+            std::cout << "Enter message: ";
+            std::cin.getline(line, chat_message::max_body_length + 1);
+
             chat_message msg;
             msg.body_length(std::strlen(line));
             std::memcpy(msg.body(), line, msg.body_length());
-            msg.update_body_with_time_and_id(c.get_client_id(), recipient_id); // Use the getter method
+            msg.update_body_with_time_and_id(c.get_client_id(), recipient_id);
             msg.encode_header();
             c.write(msg);
         }
