@@ -45,9 +45,9 @@ public:
         memcpy_s(data_, sizeof(data_), header, header_length);
     }
 
-    void update_body_with_time_and_id() {
-        std::string time_and_id = get_current_time() + " ID:" + generate_random_id() + " ";
-        std::string updated_body = time_and_id + std::string(body(), body_length_);
+    void update_body_with_time_and_id(const std::string& sender_id, const std::string& recipient_id) {
+        std::string time_and_ids = get_current_time() + " Sender:" + sender_id + " Recipient:" + recipient_id + " ";
+        std::string updated_body = time_and_ids + std::string(body(), body_length_);
         body_length(updated_body.size());
         memcpy_s(body(), max_body_length, updated_body.data(), updated_body.size());
     }

@@ -14,6 +14,7 @@ class chat_client {
     tcp::socket socket_;
     chat_message read_msg_;
     chat_message_queue write_msgs_;
+    std::string client_id_;
 
 public:
     chat_client(boost::asio::io_service& io_service, tcp::resolver::iterator endpoint_iterator)
@@ -33,6 +34,10 @@ public:
 
     void close() {
         io_service_.post([this]() { socket_.close(); });
+    }
+
+    std::string get_client_id() const {
+        return client_id_;
     }
 
     void do_connect(tcp::resolver::iterator endpoint_iterator) {
@@ -62,8 +67,15 @@ public:
             boost::asio::buffer(read_msg_.body(), read_msg_.body_length()),
             [this](boost::system::error_code ec, std::size_t /*length*/) {
                 if (!ec) {
-                    std::cout.write(read_msg_.body(), read_msg_.body_length());
-                    std::cout << "\n";
+                    std::string body(read_msg_.body(), read_msg_.body_length());
+                    if (body.find("Your ID: ") == 0) {
+                        client_id_ = body.substr(9);
+                        std::cout << "Your client ID is: " << client_id_ << std::endl;
+                    }
+                    else {
+                        std::cout.write(read_msg_.body(), read_msg_.body_length());
+                        std::cout << "\n";
+                    }
                     do_read_header();
                 }
                 else {
@@ -105,10 +117,14 @@ int main(int argc, char* argv[]) {
 
         char line[chat_message::max_body_length + 1];
         while (std::cin.getline(line, chat_message::max_body_length + 1)) {
+            std::string recipient_id;
+            std::cout << "Enter recipient ID: ";
+            std::getline(std::cin, recipient_id);
+
             chat_message msg;
             msg.body_length(std::strlen(line));
             std::memcpy(msg.body(), line, msg.body_length());
-            msg.update_body_with_time_and_id();
+            msg.update_body_with_time_and_id(c.get_client_id(), recipient_id); // Use the getter method
             msg.encode_header();
             c.write(msg);
         }
