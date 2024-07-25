@@ -127,12 +127,12 @@
     <LibraryPath>D:\Boost-app\boost_1_85_0\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Server|x64'">
-    <IncludePath>D:\Boost-app\boost_1_85_0;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Boost-app\boost_1_85_0\libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>H:\Boost\boost_1_85_0;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Boost-app\boost_1_85_0\libs;H:\Boost\boost_1_85_0;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Client|x64'">
-    <IncludePath>D:\Boost-app\boost_1_85_0;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Boost-app\boost_1_85_0\libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>H:\Boost\boost_1_85_0;$(IncludePath)</IncludePath>
+    <LibraryPath>H:\Boost\boost_1_85_0\libs;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)-client</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
